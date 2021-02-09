@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+
+#define DEBUG
+#define Q_SIZE 4
 
 void discard_inputs();
 char get_trial_char(void);
@@ -11,8 +15,7 @@ int chg_check_result(int);
 void color_hitting_game(void);
 
 const char color_array[] = {'R','G','B','Y','M','C'};
-const int color_num = sizeof(color_array) / sizeof(color_array[0]);
-const int q_size = 4;
+const int color_amount = sizeof(color_array) / sizeof(color_array[0]);
 
 int main(void){
     color_hitting_game();
@@ -34,7 +37,7 @@ char get_trial_char(void) {
 
     for(;;) {
         ch = getchar();
-        for(i=0;i<color_num;i++){
+        for(i=0;i<color_amount;i++){
             if(ch == color_array[i]) return ch;
         }
     }
@@ -47,18 +50,25 @@ void chg_display_title(void) {
 }
 
 void chg_make_question(char qx[]) {
-    int i;
+    int i,len;
+    char copy_color_array[color_amount];
+    memcpy(copy_color_array, color_array, color_amount);
 
     srand((unsigned)time(NULL));
-    for(i=0;i<q_size;i++){
-        char color_num = rand()%6;
-        qx[i] = color_array[color_num];
+    for(i=0,len=color_amount;i<Q_SIZE;i++,len--){
+        char cn = rand()%len;
+        qx[i] = copy_color_array[cn];
+        copy_color_array[cn] = copy_color_array[len-1];
     }
     printf("コンピュータが問題を出題しました。\n");
-    for(i=0;i<q_size;i++){
-        printf("%c", qx[i]);
-    }
-    puts("");
+
+    #ifdef DEBUG
+        for(i=0;i<Q_SIZE;i++){
+            printf("%c", qx[i]);
+        }
+        puts("");
+    #endif
+
     return;
 }
 
@@ -67,13 +77,13 @@ int chg_play_turn(char qx[]) {
     char tx[] = {t1,t2,t3,t4};
     int i, matched=0;
 
-    for(i=0;i<q_size;i++){
+    for(i=0;i<Q_SIZE;i++){
         tx[i] = get_trial_char();
     }
 
     discard_inputs();
 
-    for(i=0;i<q_size;i++){
+    for(i=0;i<Q_SIZE;i++){
         if(qx[i] == tx[i]) matched++;
     }
 
@@ -82,7 +92,7 @@ int chg_play_turn(char qx[]) {
 
 int chg_check_result(int matched) {
     int result = 0;
-    if(matched==q_size) {
+    if(matched==Q_SIZE) {
         result = 1;
     }
     return result;

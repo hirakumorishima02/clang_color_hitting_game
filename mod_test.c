@@ -1,12 +1,10 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#define DEBUG 1
 
-int main(void) {
-    int i;
-    srand((unsigned)time(NULL));
-    for(i=0;i<10;i++){
-        printf("%d\n", rand()%6);
-    }
-    return 0;
+int main() {
+        #if DEBUG
+                printf("Back To Your True Shape\n");
+        #endif
+        printf("CLOW CARD");
+        return 0;
 }
