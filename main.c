@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 void discard_inputs();
 char get_trial_char(void);
@@ -9,6 +10,9 @@ int chg_play_turn(char qx[]);
 int chg_check_result(int);
 void color_hitting_game(void);
 
+const char color_array[] = {'R','G','B','Y','M','C'};
+const int color_num = sizeof(color_array) / sizeof(color_array[0]);
+const int q_size = 4;
 
 int main(void){
     color_hitting_game();
@@ -26,14 +30,14 @@ void discard_inputs() {
 // 選択肢以外の文字を入力したら入力処理を繰り返す関数
 char get_trial_char(void) {
     char ch;
+    int i;
 
     for(;;) {
         ch = getchar();
-        if(ch == 'R'||ch == 'G'||
-           ch == 'B'||ch == 'Y'||
-           ch == 'M'||ch == 'C')
-            return ch;
+        for(i=0;i<color_num;i++){
+            if(ch == color_array[i]) return ch;
         }
+    }
 }
 
 void chg_display_title(void) {
@@ -43,35 +47,42 @@ void chg_display_title(void) {
 }
 
 void chg_make_question(char qx[]) {
-    qx[0] = 'R';
-    qx[1] = 'G';
-    qx[2] = 'B';
-    qx[3] = 'Y';
+    int i;
+
+    srand((unsigned)time(NULL));
+    for(i=0;i<q_size;i++){
+        char color_num = rand()%6;
+        qx[i] = color_array[color_num];
+    }
     printf("コンピュータが問題を出題しました。\n");
+    for(i=0;i<q_size;i++){
+        printf("%c", qx[i]);
+    }
+    puts("");
     return;
 }
 
 int chg_play_turn(char qx[]) {
-    char t1 = get_trial_char();
-    char t2 = get_trial_char();
-    char t3 = get_trial_char();
-    char t4 = get_trial_char();
+    char t1,t2,t3,t4;
+    char tx[] = {t1,t2,t3,t4};
+    int i, matched=0;
+
+    for(i=0;i<q_size;i++){
+        tx[i] = get_trial_char();
+    }
 
     discard_inputs();
 
-    int matched=0;
-
-    if(qx[0] == t1) matched++;
-    if(qx[1] == t2) matched++;
-    if(qx[2] == t3) matched++;
-    if(qx[3] == t4) matched++;
+    for(i=0;i<q_size;i++){
+        if(qx[i] == tx[i]) matched++;
+    }
 
     return matched;
 }
 
 int chg_check_result(int matched) {
     int result = 0;
-    if(matched==4) {
+    if(matched==q_size) {
         result = 1;
     }
     return result;
@@ -95,7 +106,7 @@ void color_hitting_game(void) {
             break;
         }
         printf("%d個正解です。\n",matched);
-        if(turn==10) puts("ゲーム終了です。");
+        if(turn==10) {puts("ゲーム終了です。"); printf("答えは%C%C%C%Cでした。\n", qx[0],qx[1],qx[2],qx[3]);};
     }
 
     return;
